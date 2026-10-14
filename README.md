@@ -60,9 +60,12 @@ Aipictors は多くのクリエイターが作品を公開している投稿サ�
 
 ### 運営者の方へ
 
-このツールの動作に問題がある場合や、利用を控えてほしい場合は、
-[GitHub の Issue](https://github.com/MikageSawatari/aipicdl/issues) からご連絡ください。
+このツールの動作に問題がある場合や、利用を控えてほしい場合は、次のいずれかからご連絡ください。
 公開の停止を含め、速やかに対応します。
+
+- メール: [mikage@sawatari.info](mailto:mikage@sawatari.info)
+- X: [@mikage](https://x.com/mikage)
+- [GitHub の Issue](https://github.com/MikageSawatari/aipicdl/issues)
 
 ## 使い方
 
