@@ -19,8 +19,6 @@ const USAGE: &str = "\
 
 オプション:
   --out <DIR>            保存先 (この下に <ユーザーID> フォルダを作る)
-  --api-interval <秒>    API リクエストの間隔 (既定 3)
-  --file-interval <秒>   ファイル取得の間隔 (既定 1)
   --no-comments          コメントを保存しない
   --no-videos            動画を保存しない
   --refresh              保存済みの作品も情報を取り直す
@@ -71,17 +69,13 @@ fn cli(args: Vec<String>) -> i32 {
                 Some(v) => opts.out_root = PathBuf::from(v),
                 None => return 2,
             },
-            "--api-interval" | "--file-interval" | "--limit" => {
+            "--limit" => {
                 let Some(v) = value(&a) else { return 2 };
-                let Ok(n) = v.parse::<f64>() else {
+                let Ok(n) = v.parse::<usize>() else {
                     eprintln!("{a} の値が数値ではありません: {v}");
                     return 2;
                 };
-                match a.as_str() {
-                    "--api-interval" => opts.api_interval = n,
-                    "--file-interval" => opts.file_interval = n,
-                    _ => opts.limit = Some(n.max(0.0) as usize),
-                }
+                opts.limit = Some(n);
             }
             "--ids" => match value("--ids") {
                 Some(v) => {

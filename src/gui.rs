@@ -16,8 +16,6 @@ const MAX_LOG_LINES: usize = 5000;
 struct Settings {
     user: String,
     out_root: String,
-    api_interval: f64,
-    file_interval: f64,
     comments: bool,
     videos: bool,
 }
@@ -28,8 +26,6 @@ impl Default for Settings {
         Self {
             user: String::new(),
             out_root: o.out_root.display().to_string(),
-            api_interval: o.api_interval,
-            file_interval: o.file_interval,
             comments: o.comments,
             videos: o.videos,
         }
@@ -155,8 +151,6 @@ impl App {
         let opts = Options {
             user: self.s.user.clone(),
             out_root: PathBuf::from(self.s.out_root.trim()),
-            api_interval: self.s.api_interval,
-            file_interval: self.s.file_interval,
             comments: self.s.comments,
             videos: self.s.videos,
             refresh: self.refresh,
@@ -315,23 +309,6 @@ impl eframe::App for App {
                 .default_open(false)
                 .show(ui, |ui| {
                     ui.add_enabled_ui(!running, |ui| {
-                        ui.horizontal(|ui| {
-                            ui.label("API リクエスト間隔");
-                            ui.add(
-                                egui::DragValue::new(&mut self.s.api_interval)
-                                    .range(1.0..=60.0)
-                                    .speed(0.1)
-                                    .suffix(" 秒"),
-                            );
-                            ui.add_space(12.0);
-                            ui.label("画像・動画の取得間隔");
-                            ui.add(
-                                egui::DragValue::new(&mut self.s.file_interval)
-                                    .range(0.2..=30.0)
-                                    .speed(0.1)
-                                    .suffix(" 秒"),
-                            );
-                        });
                         ui.checkbox(
                             &mut self.s.comments,
                             "コメント (スタンプ・アイコン含む) も保存する",

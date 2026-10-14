@@ -19,6 +19,10 @@ pub const USER_AGENT: &str = concat!(
     " (personal archiver; +https://github.com/MikageSawatari/aipicdl)"
 );
 
+/// GraphQL API へのリクエスト間隔 (固定)。
+const API_INTERVAL: Duration = Duration::from_secs(3);
+/// 画像・動画などのファイル取得間隔 (固定)。
+const FILE_INTERVAL: Duration = Duration::from_secs(1);
 const MAX_ATTEMPTS: u32 = 6;
 const BODY_LIMIT: u64 = 2 * 1024 * 1024 * 1024;
 
@@ -56,8 +60,6 @@ pub enum Kind {
 
 pub struct Client {
     agent: ureq::Agent,
-    api_interval: Duration,
-    file_interval: Duration,
     last_api: Cell<Option<Instant>>,
     last_file: Cell<Option<Instant>>,
     cancel: Arc<AtomicBool>,
@@ -70,12 +72,7 @@ pub struct Downloaded {
 }
 
 impl Client {
-    pub fn new(
-        api_interval: Duration,
-        file_interval: Duration,
-        cancel: Arc<AtomicBool>,
-        reporter: Arc<Reporter>,
-    ) -> Self {
+    pub fn new(cancel: Arc<AtomicBool>, reporter: Arc<Reporter>) -> Self {
         let config = ureq::Agent::config_builder()
             .user_agent(USER_AGENT)
             .timeout_connect(Some(Duration::from_secs(30)))
@@ -84,8 +81,6 @@ impl Client {
             .build();
         Self {
             agent: config.into(),
-            api_interval,
-            file_interval,
             last_api: Cell::new(None),
             last_file: Cell::new(None),
             cancel,
@@ -120,8 +115,8 @@ impl Client {
 
     fn throttle(&self, kind: Kind) -> Result<()> {
         let (cell, interval) = match kind {
-            Kind::Api => (&self.last_api, self.api_interval),
-            Kind::File => (&self.last_file, self.file_interval),
+            Kind::Api => (&self.last_api, API_INTERVAL),
+            Kind::File => (&self.last_file, FILE_INTERVAL),
         };
         if let Some(last) = cell.get() {
             let elapsed = last.elapsed();

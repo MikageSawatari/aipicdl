@@ -7,7 +7,6 @@ use std::path::{Path, PathBuf};
 use std::sync::Arc;
 use std::sync::Mutex;
 use std::sync::atomic::AtomicBool;
-use std::time::Duration;
 
 use anyhow::{Context, Result, anyhow};
 use serde_json::{Value, json};
@@ -24,10 +23,6 @@ pub struct Options {
     pub user: String,
     /// この下に `<ユーザーID>/` フォルダを作る。
     pub out_root: PathBuf,
-    /// GraphQL API へのリクエスト間隔 (秒)。
-    pub api_interval: f64,
-    /// 画像・動画などのファイル取得間隔 (秒)。
-    pub file_interval: f64,
     pub comments: bool,
     pub videos: bool,
     /// 保存済みの作品も情報を取り直す (ファイルは既存のものを再利用)。
@@ -43,8 +38,6 @@ impl Default for Options {
         Self {
             user: String::new(),
             out_root: default_out_root(),
-            api_interval: 3.0,
-            file_interval: 1.0,
             comments: true,
             videos: true,
             refresh: false,
@@ -130,12 +123,7 @@ pub fn run(opts: &Options, cancel: Arc<AtomicBool>, reporter: Arc<Reporter>) -> 
     let login = api::parse_user_input(&opts.user).ok_or_else(|| {
         anyhow!("プロフィール URL (https://www.aipictors.com/users/○○) を入力してください")
     })?;
-    let client = Client::new(
-        Duration::from_secs_f64(opts.api_interval.max(0.5)),
-        Duration::from_secs_f64(opts.file_interval.max(0.2)),
-        cancel,
-        reporter.clone(),
-    );
+    let client = Client::new(cancel, reporter.clone());
     let r = &reporter;
 
     r.progress("ユーザー情報を取得中", 0, 0);
