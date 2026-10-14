@@ -1,0 +1,22 @@
+aipicdl - THIRD-PARTY NOTICES
+=============================
+
+aipicdl.exe には以下のオープンソースソフトウェアが組み込まれています。
+This program includes the following open source software.
+
+{{#each overview}}
+- {{name}} ({{count}})
+{{/each}}
+
+{{#each licenses}}
+================================================================================
+{{{name}}} ({{id}})
+--------------------------------------------------------------------------------
+Used by:
+{{#each used_by}}
+  - {{crate.name}} {{crate.version}}{{#if crate.repository}} <{{crate.repository}}>{{/if}}
+{{/each}}
+
+{{{text}}}
+
+{{/each}}
