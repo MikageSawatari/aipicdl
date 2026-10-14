@@ -92,7 +92,8 @@ $zip = Join-Path $dist "$name.zip"
 if (Test-Path -LiteralPath $zip) { Remove-Item -LiteralPath $zip -Force }
 Compress-Archive -Path (Join-Path $stage '*') -DestinationPath $zip
 $hash = (Get-FileHash -Algorithm SHA256 -LiteralPath $zip).Hash.ToLowerInvariant()
-Set-Content -LiteralPath "$zip.sha256" -Value "$hash  $name.zip" -Encoding ascii
+# LF line ending so that `sha256sum -c` also works on non-Windows systems.
+[System.IO.File]::WriteAllText("$zip.sha256", "$hash  $name.zip`n", (New-Object System.Text.ASCIIEncoding))
 
 Write-Host ""
 Write-Host "[build-dist] done: $zip" -ForegroundColor Green
